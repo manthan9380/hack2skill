@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 # Resolve model path relative to the root directory (parent of 'app')
-MODEL_PATH = Path(__file__).resolve().parent.parent / "yolov8m.pt"
+MODEL_PATH = Path(__file__).resolve().parent.parent / "yolov8n.pt"
 
 
 class TrafficAIModel:
