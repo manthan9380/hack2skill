@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Traffic AI Analyzer</title>
+    <meta name="description"
+        content="AI-powered traffic image analyzer — detect vehicles, estimate CO₂ emissions, and optimize signal timing in seconds." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="static/style.css" />
+</head>
+
+<body>
+
+    <!-- Animated background orbs -->
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <div class="app-wrapper">
+
+        <!-- Header -->
+        <header class="header">
+            <div class="header-logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                    </svg>
+                </div>
+                <span class="logo-text">TrafficAI</span>
+            </div>
+            <div class="header-badge">
+                <span class="badge-dot"></span>
+                <span>AI Model Active</span>
+            </div>
+        </header>
+
+        <!-- Hero -->
+        <section class="hero">
+            <h1 class="hero-title">Traffic <span class="gradient-text">AI Analyzer</span></h1>
+            <p class="hero-subtitle">Upload a traffic image — our YOLOv8 model detects vehicles, estimates CO₂
+                emissions, and suggests optimal signal timing.</p>
+        </section>
+
+        <!-- Main Card -->
+        <main class="main-card">
+
+            <!-- Upload Zone -->
+            <div class="upload-zone" id="uploadZone">
+                <input type="file" id="imageInput" accept="image/*" hidden />
+                <div class="upload-content" id="uploadContent">
+                    <div class="upload-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M4 16l4-4 4 4 4-8 4 8" />
+                            <rect x="2" y="2" width="20" height="20" rx="4" />
+                        </svg>
+                    </div>
+                    <p class="upload-title">Drop your traffic image here</p>
+                    <p class="upload-hint">or <button class="link-btn" id="browseBtn">browse files</button></p>
+                    <p class="upload-meta">PNG, JPG, WEBP • Max 20MB</p>
+                </div>
+                <!-- Image preview replaces upload content -->
+                <div class="preview-wrapper hidden" id="previewWrapper">
+                    <img id="preview" alt="Uploaded traffic image" />
+                    <button class="change-btn" id="changeImageBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                        Change Image
+                    </button>
+                </div>
+            </div>
+
+            <!-- Analyze Button -->
+            <button class="analyze-btn" id="analyzeBtn" disabled>
+                <span class="btn-text">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.35-4.35" />
+                    </svg>
+                    Analyze Traffic
+                </span>
+                <span class="btn-loading hidden">
+                    <span class="spinner"></span>
+                    Analyzing…
+                </span>
+            </button>
+
+            <!-- Error Message -->
+            <div class="error-msg hidden" id="errorMsg">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <span id="errorText">Something went wrong.</span>
+            </div>
+
+            <!-- Results Dashboard -->
+            <section class="results-section hidden" id="resultsSection">
+                <div class="results-header">
+                    <h2>Analysis Results</h2>
+                    <div class="status-badge" id="statusBadge">
+                        <span class="status-dot"></span>
+                        <span id="statusText">NORMAL</span>
+                    </div>
+                </div>
+
+                <!-- Metric Cards -->
+                <div class="metrics-grid">
+                    <div class="metric-card card-blue">
+                        <div class="metric-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                                <path d="M16 3.13a4 4 0 010 7.75" />
+                            </svg>
+                        </div>
+                        <div class="metric-value" id="vehiclesValue">0</div>
+                        <div class="metric-label">Vehicles Detected</div>
+                    </div>
+
+                    <div class="metric-card card-red">
+                        <div class="metric-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M2 12C2 6.48 6.48 2 12 2s10 4.48 10 10-4.48 10-10 10S2 17.52 2 12z" />
+                                <path d="M12 8v4l3 3" />
+                            </svg>
+                        </div>
+                        <div class="metric-value" id="co2Value">0</div>
+                        <div class="metric-unit">g/min</div>
+                        <div class="metric-label">CO₂ Emission Rate</div>
+                    </div>
+
+                    <div class="metric-card card-green">
+                        <div class="metric-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                        </div>
+                        <div class="metric-value" id="greenValue">0</div>
+                        <div class="metric-unit">seconds</div>
+                        <div class="metric-label">Suggested Green Time</div>
+                    </div>
+
+                    <div class="metric-card card-purple">
+                        <div class="metric-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                            </svg>
+                        </div>
+                        <div class="metric-value" id="energyValue">0</div>
+                        <div class="metric-unit">%</div>
+                        <div class="metric-label">Energy Score</div>
+                    </div>
+                </div>
+
+                <!-- Energy Score Bar -->
+                <div class="energy-bar-section">
+                    <div class="energy-bar-label">
+                        <span>Energy Efficiency</span>
+                        <span id="energyBarPct">0%</span>
+                    </div>
+                    <div class="energy-bar-track">
+                        <div class="energy-bar-fill" id="energyBarFill"></div>
+                    </div>
+                </div>
+
+                <!-- Vehicle Breakdown -->
+                <div class="breakdown-section">
+                    <h3 class="breakdown-title">Vehicle Breakdown</h3>
+                    <div class="breakdown-grid" id="breakdownGrid">
+                        <div class="breakdown-item"><span class="breakdown-icon">🚗</span><span
+                                class="breakdown-label">Cars</span><span class="breakdown-count" id="carCount">0</span>
+                        </div>
+                        <div class="breakdown-item"><span class="breakdown-icon">🏍️</span><span
+                                class="breakdown-label">Motorcycles</span><span class="breakdown-count"
+                                id="motoCount">0</span></div>
+                        <div class="breakdown-item"><span class="breakdown-icon">🚌</span><span
+                                class="breakdown-label">Buses</span><span class="breakdown-count" id="busCount">0</span>
+                        </div>
+                        <div class="breakdown-item"><span class="breakdown-icon">🚚</span><span
+                                class="breakdown-label">Trucks</span><span class="breakdown-count"
+                                id="truckCount">0</span></div>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>Powered by YOLOv8 · FastAPI · Ultralytics</p>
+        </footer>
+    </div>
+
+    <script src="static/app.js"></script>
+</body>
+
+</html>
