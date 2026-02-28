@@ -4,13 +4,14 @@ import numpy as np
 from pathlib import Path
 
 
-# Resolve model path relative to the root directory (parent of 'app')
-MODEL_PATH = Path(__file__).resolve().parent.parent / "yolov8n.pt"
+# Model name for auto-download
+MODEL_NAME = "yolov8n.pt"
 
 
 class TrafficAIModel:
     def __init__(self):
-        self.model = YOLO(str(MODEL_PATH))
+        self.model = YOLO(MODEL_NAME)
+        self.model.to("cpu")  # Force CPU to save memory
 
         # CO₂ emission rates in g/min per vehicle class (COCO class IDs)
         self.emission_rates = {
@@ -21,7 +22,8 @@ class TrafficAIModel:
         }
 
     def analyze(self, image):
-        results = self.model(image, imgsz=1024, conf=0.15, verbose=False)
+        # Use smaller imgsz (640 instead of 1024) to reduce RAM usage during inference
+        results = self.model(image, imgsz=640, conf=0.15, verbose=False)
 
         total_vehicles = 0
         total_co2 = 0
